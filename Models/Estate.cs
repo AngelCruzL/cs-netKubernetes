@@ -15,4 +15,5 @@ public class Estate
   public int Price { get; set; }
   public string? Picture { get; set; }
   public DateTime? CreatedAt { get; set; }
+  public Guid? UserId { get; set; }
 }
