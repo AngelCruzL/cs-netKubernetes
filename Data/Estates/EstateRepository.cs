@@ -1,4 +1,6 @@
+using System.Net;
 using Microsoft.AspNetCore.Identity;
+using NetKubernetes.Middleware;
 using NetKubernetes.Models;
 using NetKubernetes.Token;
 
@@ -36,8 +38,15 @@ public class EstateRepository : IEstateRepository
   {
     var user = await _userManager.FindByNameAsync(_userSession.GetUserSession());
 
+    if (user is null)
+      throw new MiddlewareException(HttpStatusCode.Unauthorized,
+        new { message = "This user doesn't have permission to perform this action" });
+
+    if (estate is null)
+      throw new MiddlewareException(HttpStatusCode.BadRequest, new { message = "The estate data is not valid" });
+
     estate.CreatedAt = DateTime.Now;
-    estate.UserId = Guid.Parse(user!.Id);
+    estate.UserId = Guid.Parse(user.Id);
 
     _context.Estates!.Add(estate);
   }
