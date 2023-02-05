@@ -87,4 +87,22 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+using (var environment = app.Services.CreateScope())
+{
+  var services = environment.ServiceProvider;
+
+  try
+  {
+    var userManager = services.GetRequiredService<UserManager<User>>();
+    var context = services.GetRequiredService<AppDbContext>();
+    await context.Database.MigrateAsync();
+    await LoadDatabase.InsertDataAsync(context, userManager);
+  }
+  catch (Exception ex)
+  {
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    logger.LogError(ex, "An error occurred while migrating or seeding the database.");
+  }
+}
+
 app.Run();
