@@ -22,16 +22,16 @@ public class EstateController : ControllerBase
   }
 
   [HttpGet]
-  public ActionResult<IEnumerable<EstateResponseDto>> GetAllEstates()
+  public async Task<ActionResult<IEnumerable<EstateResponseDto>>> GetAllEstates()
   {
-    var estates = _repository.GetAllEstates();
+    var estates = await _repository.GetAllEstates();
     return Ok(_mapper.Map<IEnumerable<EstateResponseDto>>(estates));
   }
 
   [HttpGet("{id}", Name = "GetEstateById")]
-  public ActionResult<EstateResponseDto> GetEstateById(int id)
+  public async Task<ActionResult<EstateResponseDto>> GetEstateById(int id)
   {
-    var estate = _repository.GetEstateById(id);
+    var estate = await _repository.GetEstateById(id);
     if (estate is null)
       throw new MiddlewareException(HttpStatusCode.NotFound, new { message = $"Estate with the id {id} not found" });
 
@@ -39,11 +39,11 @@ public class EstateController : ControllerBase
   }
 
   [HttpPost]
-  public ActionResult<EstateResponseDto> CreateEstate([FromBody] EstateRequestDto estate)
+  public async Task<ActionResult<EstateResponseDto>> CreateEstate([FromBody] EstateRequestDto estate)
   {
     var estateModel = _mapper.Map<Estate>(estate);
-    _repository.CreateEstate(estateModel);
-    _repository.SaveChanges();
+    await _repository.CreateEstate(estateModel);
+    await _repository.SaveChanges();
 
     var estateResponseDto = _mapper.Map<EstateResponseDto>(estateModel);
 
@@ -51,14 +51,14 @@ public class EstateController : ControllerBase
   }
 
   [HttpDelete("{id}")]
-  public ActionResult DeleteEstate(int id)
+  public async Task<ActionResult> DeleteEstate(int id)
   {
-    var estate = _repository.GetEstateById(id);
+    var estate = await _repository.GetEstateById(id);
     if (estate is null)
       throw new MiddlewareException(HttpStatusCode.NotFound, new { message = $"Estate with the id {id} not found" });
 
-    _repository.DeleteEstate(id);
-    _repository.SaveChanges();
+    await _repository.DeleteEstate(id);
+    await _repository.SaveChanges();
 
     return NoContent();
   }

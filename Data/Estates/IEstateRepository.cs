@@ -4,9 +4,9 @@ namespace NetKubernetes.Data.Estates;
 
 public interface IEstateRepository
 {
-  bool SaveChanges();
-  IEnumerable<Estate> GetAllEstates();
-  Estate GetEstateById(int id);
+  Task<bool> SaveChanges();
+  Task<IEnumerable<Estate>> GetAllEstates();
+  Task<Estate> GetEstateById(int id);
   Task CreateEstate(Estate estate);
-  void DeleteEstate(int id);
+  Task DeleteEstate(int id);
 }

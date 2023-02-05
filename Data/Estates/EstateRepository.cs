@@ -1,5 +1,6 @@
 using System.Net;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using NetKubernetes.Middleware;
 using NetKubernetes.Models;
 using NetKubernetes.Token;
@@ -19,19 +20,19 @@ public class EstateRepository : IEstateRepository
     _userManager = userManager;
   }
 
-  public bool SaveChanges()
+  public async Task<bool> SaveChanges()
   {
-    return _context.SaveChanges() >= 0;
+    return await _context.SaveChangesAsync() >= 0;
   }
 
-  public IEnumerable<Estate> GetAllEstates()
+  public async Task<IEnumerable<Estate>> GetAllEstates()
   {
-    return _context.Estates!.ToList();
+    return await _context.Estates!.ToListAsync();
   }
 
-  public Estate GetEstateById(int id)
+  public async Task<Estate> GetEstateById(int id)
   {
-    return _context.Estates!.FirstOrDefault(e => e.Id == id)!;
+    return await _context.Estates!.FirstOrDefaultAsync(e => e.Id == id)!;
   }
 
   public async Task CreateEstate(Estate estate)
@@ -48,12 +49,12 @@ public class EstateRepository : IEstateRepository
     estate.CreatedAt = DateTime.Now;
     estate.UserId = Guid.Parse(user.Id);
 
-    _context.Estates!.Add(estate);
+    await _context.Estates!.AddAsync(estate);
   }
 
-  public void DeleteEstate(int id)
+  public async Task DeleteEstate(int id)
   {
-    var estate = _context.Estates!.FirstOrDefault(e => e.Id == id);
+    var estate = await _context.Estates!.FirstOrDefaultAsync(e => e.Id == id);
 
     if (estate == null) return;
 
